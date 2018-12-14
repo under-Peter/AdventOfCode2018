@@ -80,7 +80,7 @@ function advancetick1!(nw, cars)
         crashsite  = advancecar!(nw, cars[i])
         crashsite != nothing && return crashsite
     end
-    sort!(cars, by = c -> c.xy.I)
+    sort!(cars, by = c -> c.xy)
     return crashsite
 end
 
@@ -115,10 +115,22 @@ end
 function day13_2()
     nw, cars = parsefile()
     crashsite::Union{Nothing, CartesianIndex{2}} = nothing
+    nws = [copy(nw.occ)]
     while length(cars) > 1
         advancetick2!(nw,cars)
+        push!(nws, copy(nw.occ))
     end
-    return reverse(cars[1].xy.I) .- 1
+    return (reverse(cars[1].xy.I) .- 1, nws)
 end
 
-@time day13_2()
+nw, cars = parsefile()
+
+
+@time day13_2()[1]
+nws = day13_2()[2];
+nwsa = accumulate(+,nws)
+using Plots
+heatmap(nwsa[end],leg = nothing, axis = nothing)
+an = @gif for i in 1:1000
+    heatmap(nwsa[i],leg = nothing, axis = nothing)
+end
