@@ -1,5 +1,3 @@
-indfrombin(t) = sum(t .* (1,2,4,8,16))+1
-
 mutable struct PlantVec{T}
     v::T
     l::Int
@@ -8,26 +6,28 @@ mutable struct PlantVec{T}
 end
 
 Base.eltype(p::PlantVec) = eltype(p.v)
+Base.setindex!(ps::PlantVec,n,i) = setindex!(ps.v,n,i)
+Base.length(ps::PlantVec) = ps.l
 
 function Base.getindex(ps::PlantVec,i)
-    (i < 1 || i > ps.l) && return zero(eltype(ps))
+    i < 1 && return zero(eltype(ps))
+    i > ps.l && return zero(eltype(ps))
     @inbounds return ps.v[i]
 end
 
-Base.setindex!(ps::PlantVec,n,i) = (ps.v[i] = n; ps)
-Base.length(ps::PlantVec) = ps.l
-
-function Base.resize!(ps::PlantVec, l)
-    l > length(ps.v) && Base.resize!(ps.v, l * 2)
+function grow!(ps::PlantVec, l)
+    l > length(ps.v) && resize!(ps.v, l * 2)
     ps.l = l
 end
 
 function Base.fill!(ps::PlantVec, x)
-    for i in 1:ps.l
-        @inbounds ps.v[i] = x
+    @inbounds for i in 1:ps.l
+        ps.v[i] = x
     end
     return ps
 end
+
+indfrombin(t) = sum(t .* (1,2,4,8,16))+1
 
 function parsefile(T=Vector{Int})
     tobool(x) = ifelse(x=='#', true, false)
@@ -44,24 +44,16 @@ end
 
 function timestep(plants::PlantVec{T}, rules, i0 = 1, nplants = PlantVec{T}()) where T
     lp = length(plants)
-    npf = ifelse(plants[1] == zero(eltype(plants)),
-                ifelse(plants[2] == zero(eltype(plants)), 0, 1), 2)
-    npl = ifelse(plants[lp] == zero(eltype(plants)),
-                ifelse(plants[lp-1] == zero(eltype(plants)), 0, 1), 2)
-    npl += ifelse(iseven(npl+npf+lp),0,1)
-    i0 += npf
-    resize!(nplants, lp + npf + npl)
-    fill!(nplants, zero(eltype(plants)))
-    @assert iseven(length(nplants))
-    @simd for i in (1-npf):2:(lp+npl)
-        p1, p2, p3 = (plants[i-2], plants[i-1], plants[i])
-        p4, p5, p6 = (plants[i+1], plants[i+2], plants[i+3])
-        t = (p1,p2,p3,p4,p5)
+    z = zero(eltype(plants))
+    npf = ifelse(plants[1] == z,  ifelse(plants[2]    == z, 0, 1), 2)
+    npl = ifelse(plants[lp] == z, ifelse(plants[lp-1] == z, 0, 1), 2)
+    grow!(nplants, lp + npf + npl)
+    fill!(nplants, z)
+    @simd for i in (1-npf):(lp+npl)
+        t = (plants[i-2], plants[i-1], plants[i], plants[i+1], plants[i+2])
         nplants[i+npf] = rules[indfrombin(t)]
-        t2 = (p2,p3,p4,p5,p6)
-        nplants[i+npf+1] = rules[indfrombin(t2)]
     end
-    return (nplants, rules, i0, plants)
+    return (nplants, rules, i0 + npf, plants)
 end
 
 
@@ -78,10 +70,9 @@ function evolve(plants, rules, ngens; verbose::Bool=false)
 end
 
 function addpots(plants, i0)
-    s = 0
-    et = eltype(plants)
+    s, et = 0, eltype(plants)
     for i in 1:plants.l
-        s += ifelse(plants[i] == one(et), 1, 0)
+        s += ifelse(plants[i] == one(et), (i-i0), 0)
     end
     return s
 end
@@ -103,31 +94,12 @@ function ap_evolve(ngens=20; v = false, T = Vector{Int})
     return addpots(p, i0)
 end
 
-@profiler ap_evolve(10000, T = BitVector)
-@time ap_evolve(10000, T = BitVector)
-
-using BenchmarkTools
-
-for T in (Vector{Int}, Vector{Int32}, Vector{Int16}, Vector{Int8}, BitVector)
-    print("T = ", T, "\t")
-    t = @benchmark ap_evolve(20, T = $T)
-    print(minimum(t), " memory: ", t.memory, " allocs: ", t.allocs , "\n")
+day12_1() = ap_evolve(20)
+function day12_2()
+    p200 = ap_evolve(200)
+    p300 = ap_evolve(300)
+    return (p300-p200) * (500_000_000-2) + p200
 end
 
-for T in (Vector{Int}, Vector{Int32}, Vector{Int16}, Vector{Int8}, BitVector)
-    print("T = ", T, "\t")
-    t = @benchmark ap_evolve(200, T = $T)
-    print(minimum(t), " memory: ", t.memory, " allocs: ", t.allocs , "\n")
-end
-
-for n in (20,200,2000)
-    for T in (Vector{Int}, Vector{Int32}, Vector{Int16}, Vector{Int8}, BitVector)
-        s1 = rpad("T = $T",20)
-        s2 = rpad("periods = $n",16)
-        print(s1,s2)
-        t = @benchmark ap_evolve($n, T = $T)
-        print(minimum(t), "\t memory: ", t.memory, "\t allocs: ", t.allocs , "\n")
-    end
-end
-
-ts = [@belapsed ap_evolve($i) for i in 1:10:200]
+@time day12_1() == 3798
+@time day12_2() == 3900000002212
