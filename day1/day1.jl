@@ -1,11 +1,5 @@
-frequs =
-#1 result of all frequencies
+day1_1(f="input.txt") = sum(parse.(Int,readlines(f)))
 
-day1_1() = sum(parse.(Int,readlines("input.txt")))
-
-@time day1_1() == 435
-
-#2 first repeat
 function findrep(v)
     c = 0
     s = Set{Int}(c)
@@ -15,5 +9,4 @@ function findrep(v)
         push!(s,c)
     end
 end
-day1_2() = findrep(parse.(Int,readlines("input.txt")))
-@time day1_2() == 245
+day1_2(f="input.txt") = findrep(parse.(Int,readlines(f)))

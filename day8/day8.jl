@@ -1,54 +1,42 @@
-data = parse.(Int,split(readline("example.txt")," "))
-data = parse.(Int,split(readline("input.txt")," "))
-
-function tree(data)
-    metadata = Dict{String,Vector{Int}}()
-    tree = subtree!(copy(data), "root", metadata)
-    return (tree, metadata)
-end
-
-function subtree!(data, nodename, metadata)
-    nch = popfirst!(data)
-    nmd = popfirst!(data)
-    if iszero(nch)
-        metadata[nodename] = data[1:nmd]
-        deleteat!(data,1:nmd)
-        return Dict{String,Vector{String}}()
-    end
-    tree = Dict{String,Vector{String}}(nodename => [])
+function mdsum(tree, i=1, s=0)
+    nch, nmd = tree[i], tree[i+1]
+    i += 2
     for ch in 1:nch
-        nn = string(gensym())
-        push!(tree[nodename], nn)
-        tree = merge(tree,subtree!(data, nn, metadata))
+        i, s = mdsum(tree, i, s)
     end
-    metadata[nodename] = data[1:nmd]
-    deleteat!(data,1:nmd)
-    return tree
+    for j in i .+ (0:nmd-1)
+        s += tree[j]
+    end
+    i+nmd, s
 end
 
-function metadatasum(data)
-    td, md = tree(data)
-    return sum(sum(v) for v in values(md))
-end
-
-#p 1
-metadatasum(data)
-
-function nodevalue(node, tree, metadata)
-    if haskey(tree, node)
-        chs = tree[node]
-        indxs = filter(i -> i <= length(chs), metadata[node])
-        return sum([nodevalue(n,tree,metadata) for n in tree[node][indxs]])
+function nodevalue(tree, l=1)
+    nch, nmd = tree[l], tree[l+1]
+    l += 2
+    nvals = zeros(Int, nch)
+    for i in 1:nch
+        l, nvals[i] = nodevalue(tree, l)
+    end
+    v = 0
+    if nch == 0
+        for i in (0:nmd-1) .+ l
+            v += tree[i]
+        end
     else
-        return sum(metadata[node])
+        for i in (0:nmd-1) .+ l
+            1 ≤ tree[i] ≤ nch && (v += nvals[tree[i]])
+        end
     end
+    l+nmd , v
 end
 
 
-function rootvalue(data)
-    td, md = tree(data)
-    nodevalue("root", td, md)
+function day8_1(f="input.txt")
+    data = parse.(Int, split(readline(f)," "))
+    return mdsum(data)[2]
 end
 
-#p2
-rootvalue(data)
+function day8_2(f="input.txt")
+    data = parse.(Int, split(readline(f)," "))
+    return nodevalue(data)[2]
+end

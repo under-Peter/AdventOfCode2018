@@ -20,11 +20,6 @@ function day3_1(f="input.txt")
     count(x -> x>1, arr)
 end
 
-#1 count overlapping patches
-@time day3_1() == 124850
-
-#2 find claim that does not overlap with any
-
 function day3_2(f="input.txt")
     v = myparse(f)
     xmax = maximum(getindex.(v,1) .+ getindex.(v,3))
@@ -37,5 +32,3 @@ function day3_2(f="input.txt")
         all(==(1), arr[x .+ (1:Δx),y .+ (1:Δy)]) && return i
     end
 end
-
-day3_2() == 1097

@@ -1,7 +1,5 @@
 using Dates
 
-a = readlines("input.txt")
-
 function myparse(f="input.txt")
     data = readlines(f)
     parseddata = Tuple{DateTime, Union{SubString,Int}}[]
@@ -57,13 +55,9 @@ function day4_1(f="input.txt")
             maxid = guard
         end
     end
-    return (argmax(sleepyhours(guards[maxid]))-1) * id
+    return (argmax(sleepyhours(guards[maxid]))-1) * maxid
 end
 
-#1 guard who sleeps most - when is he most asleep?
-@time day4_1() == 98680
-
-#2 of all guards, which guard is most frequencly asleep on the same minute?
 function day4_2(f="input.txt")
     guards = groupguards(f)
     v = [(guard, findmax(sleepyhours(sleeps))...) for (guard, sleeps) in guards]
@@ -71,5 +65,3 @@ function day4_2(f="input.txt")
     id, t = v[i][[1,3]]
     return id * (t-1)
 end
-
-@time day4_2() == 9763
