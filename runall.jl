@@ -42,3 +42,8 @@ day8_2("day8/input.txt")  == 24262
 include("day9/day9.jl")
 day9_1() == 394486
 day9_2()  == 3276488008
+
+#Day 16
+include("day16/day16.jl")
+day16_1("day16/input.txt") == 588
+day16_2("day16/input.txt") == 627
