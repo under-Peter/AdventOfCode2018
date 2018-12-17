@@ -84,16 +84,14 @@ function advancetick1!(nw, cars)
     return crashsite
 end
 
-function day13_1()
-    nw, cars = parsefile()
+function day13_1(f="input.txt")
+    nw, cars = parsefile(f)
     crashsite::Union{Nothing, CartesianIndex{2}} = nothing
     while crashsite == nothing
         crashsite = advancetick1!(nw,cars)
     end
     return reverse(crashsite.I) .-1
 end
-
-@time day13_1() == (8,3) # 8, 3
 
 function advancetick2!(nw, cars)
     crashsite::Union{Nothing,CartesianIndex{2}} = nothing
@@ -112,8 +110,8 @@ function advancetick2!(nw, cars)
     return nothing
 end
 
-function day13_2()
-    nw, cars = parsefile()
+function day13_2(f="input.txt")
+    nw, cars = parsefile(f)
     crashsite::Union{Nothing, CartesianIndex{2}} = nothing
     nws = [copy(nw.occ)]
     while length(cars) > 1
@@ -123,14 +121,10 @@ function day13_2()
     return (reverse(cars[1].xy.I) .- 1, nws)
 end
 
-nw, cars = parsefile()
-
-
-@time day13_2()[1]
-nws = day13_2()[2];
-nwsa = accumulate(+,nws)
-using Plots
-heatmap(nwsa[end],leg = nothing, axis = nothing)
-an = @gif for i in 1:1000
-    heatmap(nwsa[i],leg = nothing, axis = nothing)
-end
+# nws = day13_2()[2];
+# nwsa = accumulate(+,nws)
+# using Plots
+# heatmap(nwsa[end],leg = nothing, axis = nothing)
+# an = @gif for i in 1:1000
+#     heatmap(nwsa[i],leg = nothing, axis = nothing)
+# end

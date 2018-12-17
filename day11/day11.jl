@@ -7,7 +7,7 @@ function grid(gsn)
     return grid
 end
 
-function ap_power(gsn; ns = [3])
+function power(gsn; ns = [3])
     accgrd = accumulate(+, accumulate(+, grid(gsn), dims=1), dims=2)
     pval((x,y),n) = accgrd[x+n,y+n] + accgrd[x,y] - accgrd[x,y+n] - accgrd[x+n,y]
     maxpars = (1, CartesianIndex(1,1), 1)
@@ -20,11 +20,9 @@ function ap_power(gsn; ns = [3])
     return maxpars
 end
 
-day11_1() = ap_power(1788, ns=3)[2].I .+ 1
+day11_1() = power(1788, ns=3)[2].I .+ 1
+
 function day11_2()
-    (pv, cinds, n) = ap_power(1788, ns=1:300)
+    (pv, cinds, n) = power(1788, ns=1:300)
     return ((cinds.I .+ 1)..., n)
 end
-
-day11_1()
-day11_2()

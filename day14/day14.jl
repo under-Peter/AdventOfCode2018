@@ -37,6 +37,13 @@ function addrecipes!(rs, elfs)
     return ifelse(iszero(d), 1, 2)
 end
 
+function fastcompare(rs, dinput, inds)
+    for (i,j) in enumerate(inds)
+        dinput[i] == rs[j] || return false
+    end
+    return true
+end
+
 function day14_1(nr=9, init=Int8[3,7], nelfs=2)
     elfs = collect(1:nelfs)
     rs = Recipes(init, nr+10+1)
@@ -44,20 +51,6 @@ function day14_1(nr=9, init=Int8[3,7], nelfs=2)
         addrecipes!(rs, elfs)
     end
     join(map(string,rs.v[(1:10) .+ nr]))
-end
-
-day14_1(9) == "5158916779"
-day14_1(5) == "0124515891"
-day14_1(18) == "9251071085"
-day14_1(2018) == "5941429882"
-
-@time day14_1(540561) == "1413131339"
-
-function fastcompare(rs, dinput, inds)
-    for (i,j) in enumerate(inds)
-        dinput[i] == rs[j] || return false
-    end
-    return true
 end
 
 function day14_2(input, init=Int8[3,7], nelfs=2)
@@ -75,10 +68,3 @@ function day14_2(input, init=Int8[3,7], nelfs=2)
     end
     error()
 end
-
-day14_2("51589") == 9
-day14_2("01245") == 5
-day14_2("92510") == 18
-day14_2("59414") == 2018
-
-day14_2("540561") == 20254833

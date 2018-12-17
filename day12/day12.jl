@@ -29,9 +29,9 @@ end
 
 indfrombin(t) = sum(t .* (1,2,4,8,16))+1
 
-function parsefile(T=Vector{Int})
+function parsefile(f="input.txt",T=Vector{Int})
     tobool(x) = ifelse(x=='#', true, false)
-    file = readlines("input.txt")
+    file = readlines(f)
     plants = map(tobool,collect(match(r"[#.]+",file[1]).match))
     rules = zeros(Int8,2^5)
     fill!(rules, false)
@@ -88,18 +88,18 @@ function printplants(plants, i0)
     println()
 end
 
-function ap_evolve(ngens=20; v = false, T = Vector{Int})
-    pf = parsefile(T)
+function ap_evolve(ngens=20,f="input.txt"; v = false, T = Vector{Int})
+    pf = parsefile(f,T)
     p, i0  = evolve(pf...,ngens, verbose=v)
     return addpots(p, i0)
 end
 
-day12_1() = ap_evolve(20)
-function day12_2()
-    p200 = ap_evolve(200)
-    p300 = ap_evolve(300)
+day12_1(f="input.txt") = ap_evolve(20,f)
+function day12_2(f="input.txt")
+    p200 = ap_evolve(200,f)
+    p300 = ap_evolve(300,f)
     return (p300-p200) * (500_000_000-2) + p200
 end
 
-@time day12_1() == 3798
-@time day12_2() == 3900000002212
+# @time day12_1() == 3798
+# @time day12_2() == 3900000002212

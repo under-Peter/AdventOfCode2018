@@ -192,14 +192,6 @@ function day15_1(f="input.txt"; verbose=false)
     return s * t
 end
 
-day15_1("einput1.txt") == 47*590
-day15_1("einput2.txt") == 37*982
-day15_1("einput3.txt") == 46*859
-day15_1("einput4.txt") == 35*793
-day15_1("einput5.txt") == 54*536
-day15_1("einput6.txt") == 20*937
-day15_1("input.txt") == 243390
-
 function day15_2(f="input.txt";verbose=false)
     w = parsefile(f)
     nelfs = count(x -> x isa Elf, w.units)
@@ -216,10 +208,3 @@ function day15_2(f="input.txt";verbose=false)
     s = sum(ifelse(isalive(u), u.hp, 0) for u in wpost.units)
     return s * t
 end
-
-day15_2("einput1.txt") == 29*172
-day15_2("einput3.txt") == 33*948
-day15_2("einput4.txt") == 37*94
-day15_2("einput5.txt") == 39*166
-day15_2("einput6.txt") == 30*38
-day15_2("input.txt") == 59886
