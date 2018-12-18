@@ -32,8 +32,8 @@ function addrecipes!(rs, elfs)
     d != 0 && push!(rs,d)
     push!(rs, r)
     l = length(rs)
-    elfs[1] = mod1(elfs[1] + es1 + 1,l)
-    elfs[2] = mod1(elfs[2] + es2 + 1,l)
+    elfs[1] = mod1(e1 + es1 + 1,l)
+    elfs[2] = mod1(e2 + es2 + 1,l)
     return ifelse(iszero(d), 1, 2)
 end
 

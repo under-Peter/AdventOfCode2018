@@ -62,8 +62,8 @@ day13_2("day13/input.txt")[1] == (73,121)
 
 #Day 14
 include("day14/day14.jl")
-day14_2("540561") == 20254833
 day14_1(540561) == "1413131339"
+day14_2("540561") == 20254833
 
 #Day 15
 include("day15/day15.jl")
@@ -79,3 +79,7 @@ day16_2("day16/input.txt") == 627
 include("day17/day17.jl")
 day17_1("day17/input.txt") == 36787
 day17_2("day17/input.txt") == 29662
+
+#Day 18
+include("day18/day18.jl")
+day18_1("day18/input.txt")
